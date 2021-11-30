@@ -1,41 +1,40 @@
-drop database exercise_1;
-Create database exercise_1;
-use exercise_1;
-create table student(
-	student_id int primary key,
-    student_name varchar(20) not null
+create database registration;
+use registration;
+create table Student (
+	StudentID int,
+    StudentName varchar(20),
+    primary key (StudentID)
 );
-create table registration(
-	student_id int not null,
-    section_no int not null unique,
-    semester varchar(20),
-    primary key (student_id, section_no, semester),
-    constraint registration_fk foreign key resgistration (student_id) references student (student_id)
+create table Faculty (
+	FacultyID int,
+    FacultyName varchar(20) unique,
+    PRIMARY KEY (FacultyID)
 );
-
-create table faculty (
-	faculty_id int not null unique primary key,
-    faculty_name varchar(20) not null
+create table Course (
+	CourseID varchar(10),
+    CourseName varchar(30) unique,
+    PRIMARY KEY (CourseID)
 );
-create table qualified (
-	faculty_id int not null,
-    course_id varchar(20) not null unique,
-    date_qualified date,
-    constraint qualified_pk primary key (faculty_id, course_id),
-    constraint qualified_fk foreign key qualified (faculty_id) references faculty (faculty_id)
+create table Qualified (
+	FacultyID int,
+    CourseID varchar(10),
+    DateQualified date not null,
+    primary key (FacultyID, CourseID),
+    foreign key (FacultyID) references Faculty (FacultyID),
+    foreign key (CourseID) references Course (CourseID)
 );
--- set foreign_key_checks=0;
-create table course (
-	course_id varchar(20) unique not null,
-    course_name varchar(20) not null,
-    constraint course_pk primary key (course_id),
-    constraint course_fk foreign key course (course_id) references qualified (course_id)
+create table Section (
+	SectionNo int,
+    Semester varchar(10),
+    CourseID varchar(10),
+    primary key (SectionNo, Semester, CourseID),
+    foreign key (CourseID) references Course (CourseID)
 );
-create table section (
-	section_no int not null,
-    semester varchar(20) not null,
-    course_id varchar(20) not null,
-    constraint section_pk primary key (section_no, semester, course_id),
-    constraint section_fk1 foreign key section (section_no) references registration (section_no),
-    constraint section_fk2 foreign key section (course_id) references course (course_id)
+create table Registration (
+	StudentID int,
+    SectionNo int,
+    Semester varchar(10),
+    primary key (StudentID, SectionNo, Semester),
+    foreign key (StudentID) references Student (StudentID),
+    foreign key (SectionNo) references Section (SectionNo)
 );
