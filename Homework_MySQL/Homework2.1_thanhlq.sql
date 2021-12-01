@@ -1,6 +1,6 @@
-drop database registration;
-create database registration;
-use registration;
+-- drop database Homework_1;
+create database Homework_1;
+use Homework_1;
 create table Student (
 	StudentID int,
     StudentName varchar(20),
@@ -21,12 +21,8 @@ create table Qualified (
     CourseID varchar(10),
     DateQualified date not null,
     primary key (FacultyID, CourseID),
-    foreign key (FacultyID) references Faculty (FacultyID)
-		on delete restrict
-        on update cascade,
+    foreign key (FacultyID) references Faculty (FacultyID),
     foreign key (CourseID) references Course (CourseID)
-		on delete restrict
-        on update cascade 
 );
 create table Section (
 	SectionNo int,
@@ -61,32 +57,38 @@ values ('38214','2714','I-2008'),('54907','2714','I-2008'),
 ('54907','2715','I-2008'),('66324','2713','I-2008');
 SET FOREIGN_KEY_CHECKS=1;
 -- answer for question A
+-- Display the course ID and course name for all courses with an ISM prefix
 select CourseID, CourseName 
 from Course
 where courseID like 'ISM%';
 -- answer for question B
+-- Display courses information for which Professor Berndt has been qualified
 select FacultyID, CourseID, DateQualified
 from Qualified
 where FacultyID in (select FacultyID from faculty where facultyName = 'Berndt');
 -- answer for question C
+-- Which faculty are qualified to teach ISM 3113?
 select FacultyName
 from Faculty
 where FacultyID In (select FacultyID from qualified where courseID = 'ISM 3113');
 -- answer for question D
+-- Is any faculty qualified to teach ISM 3113 and not qualified to teach ISM 4930?
 select FacultyName
 from Faculty
 where FacultyID In (select FacultyID from qualified where courseID = 'ISM 3113')
 and FacultyID not in(select FacultyID from qualified where courseID = 'ISM 4930');
--- answer for question execute
+-- answer for question E
+-- How many students were enrolled in section 2714 during semester I-2008
 select count(studentID) 
 from registration
 where sectionNo = '2714' and Semester = 'I-2008';
-
+-- How many students were enrolled in ISM 3113 during semester I-2008?
 select count(studentID) 
 from registration
 where Semester = 'I-2008'
 and sectionNo in (select sectionNo from Section where CourseID = 'ISM 3113'); 
 -- answer for question F
+-- Which students were not enrolled in any courses during semester I-2008
 select studentID, studentName
 from Student
 Where StudentID not in (select StudentID from registration where semester = 'I-2008');
