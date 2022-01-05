@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="library/jquery-3.6.0.min.js"></script>
+    <script src="library/jquery.validate.min.js"></script>
+    <style>
+        label.error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <button id="hide_form" style="background-color: sandybrown;">Hide form</button>
+    <button id="show_form" style="background-color: sandybrown;">Show form</button><br><br>
+    <button id="hide_table" style="background-color: silver;">Hide table</button>
+    <button id="show_table" style="background-color: silver;">Show table</button><br><br>
+    <form>
+        <fieldset style="width: fit-content;">
+            Student ID: <input type="number" name="student_id" minlength="5" maxlength="5" required><br><br>
+            Full name: <input type="text" name="full_name" minlength="2" required><br><br>
+            Gender: <input type="radio" name="gender" value="Female" required>Female<input type="radio" name="gender" value="Male" required>Male<br><br>
+            Date of birth: <input type="date" name="dob" min="1998" max="2003" required><br><br>
+            Grade: <input type="number" name="grade" max="10" min="0" step="0.1" required><br><br>
+            <button type="button" id="submit">Submit</button>
+        </fieldset>
+    </form>
+    <br><br>
+    <table border="1" id="table">
+        <tr>
+            <th>No.</th>
+            <th>Student ID</th>
+            <th>First name</th>
+            <th>Last Name</th>
+            <th>Gender</th>
+            <th>Date of birth</th>
+            <th>Age</th>
+            <th>Grade</th>
+            <th>Classification</th>
+            <th>Ranking</th>
+        </tr>
+    </table>
+
+    <script>
+        $(document).ready(function(){
+            $('form').validate();
+        })
+        // $('form').hide();
+        // $('table').hide();
+        $('#show_form').click(function(){
+            $('form').show();
+        })
+        $('#hide_form').click(function(){
+            $('form').hide();
+        })
+        $('#show_table').click(function(){
+            $('table').show();
+        })
+        $('#hide_table').click(function(){
+            $('table').hide();
+        })
+        var i = 1;
+        var list_grade = [];
+        $('#submit').click(function(){
+            if(i > 15) alert('full of students')
+            else{
+                $('table').show();
+                $('table').append("<tr id =" + i + "></tr>");
+                $('#' + i).append("<td>" + i + "</td>");
+                $('#' + i).append("<td>" +  $('input[type = number]:first-child').val()+ "</td>");
+                var name = $('input[type=text').val().split(' ');
+                var fullname = $('input[type=text').val();
+                $('#' + i).append("<td>"+ name[0] + "</td>");
+                // $('#' + i).append("<td>" + fullname[fullname.length - 1] + "</td>");
+                $('#' + i).append("<td>" + fullname.substring(name[0].length).trim() + "</td>");
+                // $('#' + i).append("<td>" + fullname.slice(1,-1).join(' ') + "</td>");
+                $('#' + i).append("<td>" + $('input[type=radio]:checked').val() + "</td>");
+                $('#' + i).append("<td>" + $('input[type=date]').val() + "</td>");
+                $('#'+ i).append("<td>" + _calcAge() + "</td>");
+                // $('#'+ i).append("<td>" + $('input[type = number]:last').val() + "</td>");
+                var grade = parseFloat($('input[type = number]:last').val()).toFixed(1);
+                list_grade.push(grade);
+                $('#'+ i).append("<td>" + grade + "</td>");
+                $('#'+ i).append("<td>" + grade_classification(grade) + "</td>");
+                //ranking validation
+                var list_rank_temp=[];
+                var same_grade = 0;
+                var seperate_value_rank=[];
+                _ranking(grade, same_grade, seperate_value_rank, list_rank_temp);
+                i++;
+            }
+        })
+
+        function _ranking(grade, same_grade, seperate_value_rank, list_rank_temp) {
+            if(i==1){
+                $('#'+ i).append("<td>" + 1 + "<td>");
+            }else{
+                seperate_value_rank = list_grade.sort().reverse();
+                for(var sort_i = 0; sort_i < i; sort_i++){
+                    if(grade == parseFloat(list_grade[sort_i])){
+                        same_grade++;
+                    }
+                }
+                seperate_value_rank = seperate_value_rank.filter((element, index) => {
+                    return seperate_value_rank.indexOf(element) === index;
+                });
+                for(var sort_i = 0; sort_i < seperate_value_rank.length; sort_i++){
+                    if(grade == parseFloat(seperate_value_rank[sort_i])){
+                        list_rank_temp.push(sort_i+1);
+                    }
+                }
+                $('#'+i).append("<td>" + list_rank_temp[0] +"</td>");
+                if(same_grade == 1){
+                    var table = document.getElementById("table");
+                    for(var numb_rows = 1; numb_rows < (table.rows.length -1); numb_rows++) {
+                        if( parseFloat(table.rows[numb_rows].cells[7].innerHTML) < parseFloat($('input[type = number]:last').val()) ){
+                            table.rows[numb_rows].cells[9].innerHTML = parseInt(table.rows[numb_rows].cells[9].innerHTML) + 1;
+                        }
+                    }
+                }  
+            }
+        }
+
+        function _calcAge() {
+            var givenDate = new Date();
+            var birthDate = new Date($('input[type=date]').val());
+            var years = (givenDate.getFullYear() - birthDate.getFullYear());
+            return years;
+        }
+
+        function grade_classification(grade){
+            if(grade < 5.0) classificate = 'E'
+            else if (grade >= 5.0 && grade < 7.0)  classificate='D'
+            else if (grade >= 7.0 && grade < 8.0)  classificate='C'
+            else if (grade >= 8.0 && grade < 9.0)  classificate='B'
+            else classificate = 'A';
+            return classificate;
+        }
+    </script>
+</body>
+</html>
