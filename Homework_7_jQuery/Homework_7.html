@@ -15,6 +15,11 @@
     </style>
 </head>
 <body>
+    <select id="language">
+        <option>Language</option>
+        <option value="vietnamese">Vietnamese</option>
+        <option value="english">English</option>
+    </select><br><br>
     <button id="hide_form" style="background-color: sandybrown;">Hide form</button>
     <button id="show_form" style="background-color: sandybrown;">Show form</button><br><br>
     <button id="hide_table" style="background-color: silver;">Hide table</button>
@@ -63,6 +68,41 @@
         $('#hide_table').click(function(){
             $('table').hide();
         })
+
+        $("#language").change(function() {
+         if ($(this).val() == "vietnamese") {
+            $("#show_form").text("Hiện mẫu đăng kí");
+            $("#hide_form").text("Ẩn mẫu đăng kí");
+            $("#hide_table").text("Ẩn bảng thông tin");
+            $("#show_table").text("Hiện bảng thông tin");
+            document.getElementById("table").rows[0].cells[0].innerHTML = "STT";
+            document.getElementById("table").rows[0].cells[1].innerHTML = "MSSV";
+            document.getElementById("table").rows[0].cells[2].innerHTML = "Họ";
+            document.getElementById("table").rows[0].cells[3].innerHTML = "Tên";
+            document.getElementById("table").rows[0].cells[4].innerHTML = "Giới tính";
+            document.getElementById("table").rows[0].cells[5].innerHTML = "Ngày sinh";
+            document.getElementById("table").rows[0].cells[6].innerHTML = "Tuổi";
+            document.getElementById("table").rows[0].cells[7].innerHTML = "Điểm";
+            document.getElementById("table").rows[0].cells[8].innerHTML = "Học lực";
+            document.getElementById("table").rows[0].cells[9].innerHTML = "Thứ hạng";
+         } else if ($(this).val() == "english") {
+            $("#show_form").text("Show form");
+            $("#hide_form").text("Hide form");
+            $("#hide_table").text("Hide table");
+            $("#show_table").text("Show table");
+            document.getElementById("table").rows[0].cells[0].innerHTML = "No.";
+            document.getElementById("table").rows[0].cells[1].innerHTML = "Student ID";
+            document.getElementById("table").rows[0].cells[2].innerHTML = "First name";
+            document.getElementById("table").rows[0].cells[3].innerHTML = "Last name";
+            document.getElementById("table").rows[0].cells[4].innerHTML = "Gender";
+            document.getElementById("table").rows[0].cells[5].innerHTML = "Day of birth";
+            document.getElementById("table").rows[0].cells[6].innerHTML = "Age";
+            document.getElementById("table").rows[0].cells[7].innerHTML = "Grade";
+            document.getElementById("table").rows[0].cells[8].innerHTML = "Classification";
+            document.getElementById("table").rows[0].cells[9].innerHTML = "Ranking";
+         }
+      })
+
         var i = 1;
         var list_grade = [];
         $('#submit').click(function(){
@@ -91,13 +131,25 @@
                 var same_grade = 0;
                 var seperate_value_rank=[];
                 _ranking(grade, same_grade, seperate_value_rank, list_rank_temp);
+                highlight_top_student();
+                
                 i++;
             }
         })
+        function highlight_top_student(){
+            numb_rows = document.getElementById("table").rows;
+            for(var temp = 1; temp < numb_rows.length; temp++){
+                if(numb_rows[temp].cells[9].innerHTML == "1"){
+                    $("tr#"+temp).css("background-color", "#EE4B2B");
+                }else{
+                    $("tr#"+temp).css("background-color", "white");
+                }
+            }
+        }
 
         function _ranking(grade, same_grade, seperate_value_rank, list_rank_temp) {
             if(i==1){
-                $('#'+ i).append("<td>" + 1 + "<td>");
+                $('#'+ i).append("<td>" + 1 + "</td>");
             }else{
                 seperate_value_rank = list_grade.sort().reverse();
                 for(var sort_i = 0; sort_i < i; sort_i++){
