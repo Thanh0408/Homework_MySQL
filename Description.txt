@@ -1,0 +1,5 @@
+This is my homework. When I was studing at TSDV.
+Teacher: Ngo Dinh Long(longndt)
+Including: 
+	+mySQL
+	+jQuery, javascript, css
