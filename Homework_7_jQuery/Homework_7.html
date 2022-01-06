@@ -12,6 +12,9 @@
             color: red;
             font-weight: bold;
         }
+        body {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -25,7 +28,8 @@
     <button id="hide_table" style="background-color: silver;">Hide table</button>
     <button id="show_table" style="background-color: silver;">Show table</button><br><br>
     <form>
-        <fieldset style="width: fit-content;">
+        <fieldset style="width: fit-content; margin-right: auto; margin-left: auto">
+            <legend>ADD STUDENT</legend>
             Student ID: <input type="number" name="student_id" minlength="5" maxlength="5" required><br><br>
             Full name: <input type="text" name="full_name" minlength="2" required><br><br>
             Gender: <input type="radio" name="gender" value="Female" required>Female<input type="radio" name="gender" value="Male" required>Male<br><br>
@@ -35,7 +39,15 @@
         </fieldset>
     </form>
     <br><br>
-    <table border="1" id="table">
+    <nav id='infor_summary'>
+        <h id="numb_student">Student: 0/15</h><br>
+        <h id="numb_male">Male: 0</h><br>
+        <h id="numb_female">Female: 0</h><br>
+        <h id="ratio_gender">Ratio gender</h><br>
+        <h id="average_grade">Average grade</h><br>
+        <h id="grade_classification_summary"></h><br><br>
+    </nav>
+    <table border="1" id="table" style="margin-right: auto; margin-left: auto">
         <tr>
             <th>No.</th>
             <th>Student ID</th>
@@ -54,8 +66,9 @@
         $(document).ready(function(){
             $('form').validate();
         })
-        // $('form').hide();
-        // $('table').hide();
+        $('form').hide();
+        $('table').hide();
+        $('nav').hide();
         $('#show_form').click(function(){
             $('form').show();
         })
@@ -64,9 +77,11 @@
         })
         $('#show_table').click(function(){
             $('table').show();
+            $('nav').show();
         })
         $('#hide_table').click(function(){
             $('table').hide();
+            $('nav').hide();
         })
 
         $("#language").change(function() {
@@ -102,7 +117,13 @@
             document.getElementById("table").rows[0].cells[9].innerHTML = "Ranking";
          }
       })
-
+        var grade_A = 0;
+        var grade_B = 0;
+        var grade_C = 0;
+        var grade_D = 0;
+        var grade_E = 0;
+        var numb_male = 0;
+        var numb_female = 0;
         var i = 1;
         var list_grade = [];
         $('#submit').click(function(){
@@ -132,7 +153,19 @@
                 var seperate_value_rank=[];
                 _ranking(grade, same_grade, seperate_value_rank, list_rank_temp);
                 highlight_top_student();
-                
+                if($('input[type=radio]:checked').val() == 'Male') numb_male++
+                if($('input[type=radio]:checked').val() == 'Female') numb_female++
+                $('#numb_student').text('Student: '+ i +'/15');
+                $('#numb_male').text('Male: '+ numb_male);
+                $('#numb_female').text('Female: '+ numb_female);
+                $('#ratio_gender').text('Female: '+ parseFloat(numb_female/i*100).toFixed(2) + '%' + ", Male: " + parseFloat(100 - parseFloat(numb_female/i*100).toFixed(2)).toFixed(2) + "%");
+                _average_grade(i);
+                if(grade < 5.0) grade_E++;
+                else if (grade >= 5.0 && grade < 7.0) grade_D++;
+                else if (grade >= 7.0 && grade < 8.0) grade_C++;
+                else if (grade >= 8.0 && grade < 9.0) grade_B++;
+                else grade_A++;
+                $('#grade_classification_summary').text('Grade classification summary: A= ' + grade_A + ', B= '+ grade_B + ', C= '+ grade_C + ', D= '+ grade_D + ', E= '+ grade_E)
                 i++;
             }
         })
@@ -146,12 +179,20 @@
                 }
             }
         }
+        function _average_grade(i){
+            var average_grade = 0;
+            for(var temp = 1; temp <= i; temp++){
+                average_grade += parseFloat(document.getElementById("table").rows[temp].cells[7].innerHTML);
+            }
+            $('#average_grade').text('Average grade: ' + parseFloat(average_grade/i).toFixed(2) + '/10');
+        }
 
         function _ranking(grade, same_grade, seperate_value_rank, list_rank_temp) {
             if(i==1){
                 $('#'+ i).append("<td>" + 1 + "</td>");
             }else{
-                seperate_value_rank = list_grade.sort().reverse();
+                seperate_value_rank = list_grade.sort(function(a, b){return b-a});
+                console.log(seperate_value_rank);
                 for(var sort_i = 0; sort_i < i; sort_i++){
                     if(grade == parseFloat(list_grade[sort_i])){
                         same_grade++;
@@ -185,10 +226,10 @@
         }
 
         function grade_classification(grade){
-            if(grade < 5.0) classificate = 'E'
-            else if (grade >= 5.0 && grade < 7.0)  classificate='D'
-            else if (grade >= 7.0 && grade < 8.0)  classificate='C'
-            else if (grade >= 8.0 && grade < 9.0)  classificate='B'
+            if(grade < 5.0) classificate = 'E';
+            else if (grade >= 5.0 && grade < 7.0) classificate='D';
+            else if (grade >= 7.0 && grade < 8.0) classificate='C';
+            else if (grade >= 8.0 && grade < 9.0) classificate='B';
             else classificate = 'A';
             return classificate;
         }
