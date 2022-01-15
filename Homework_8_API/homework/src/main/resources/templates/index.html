@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index page</title>
+    <style>
+        /*label.error {*/
+        /*    color: red;*/
+        /*    font-weight: bold;*/
+        /*}*/
+        body {
+            text-align: center;
+        }
+    </style>
+    <script src="JQuery/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <button id="show_form">Show form to add new car</button>
+    <button id="hide_form">Hide form to add new car</button><br><br>
+    <button id="show_table">Show table</button>
+    <button id="hide_table">Hide table</button><br><br>
+    <form id="form_add">
+        <fieldset style="width: fit-content; margin-right: auto; margin-left: auto">
+            <legend>ADD NEW CAR</legend>
+            Name: <input type="text" id="name" name="name" required placeholder="Toyota"><br><br>
+            Manufacturer: <input type="text" id="manufacturer" name="manufacturer" required placeholder="Toyota motor corporation"><br><br>
+            Year: <input type="number" name="year" id="year" required placeholder="2021"><br><br>
+            Color: <input type="text" name="color" id="color" required placeholder="White"><br><br>
+            Price: <input type="number" name="price" id="price" required placeholder="1234" step="0.1"><br><br>
+            <input type="button" value="submit" id="submit"></a>
+        </fieldset><br><br>
+    </form>
+
+    <form id="form_edit">
+        <fieldset style="width: fit-content; margin-right: auto; margin-left: auto">
+            <legend>Edit CAR</legend>
+            Name: <input type="text" id="name_edit" name="name" required placeholder="Toyota"><br><br>
+            Manufacturer: <input type="text" id="manufacturer_edit" name="manufacturer" required placeholder="Toyota motor corporation"><br><br>
+            Year: <input type="number" name="year" id="year_edit" required placeholder="2021"><br><br>
+            Color: <input type="text" name="color" id="color_edit" required placeholder="White"><br><br>
+            Price: <input type="number" name="price" id="price_edit" required placeholder="1234" step="0.1"><br><br>
+            <input type="button" value="submit" id="submit_edit"></a>
+        </fieldset><br><br>
+    </form>
+
+    <table id="table" style="margin-right: auto; margin-left: auto" border="1">
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Modify</th>
+        </tr>
+    </table>
+
+<script>
+    $('#form_add').hide();
+    $('#form_edit').hide();
+
+    $('#show_form').click(function (){
+        $('#form_add').show();
+    })
+    $('#hide_form').click(function (){
+        $('#form_add').hide();
+    })
+    $('#show_table').click(function (){
+        $('table').show();
+
+    })
+    $('#hide_table').click(function (){
+        $('table').hide();
+    })
+
+    //add new car
+    $('#submit').click(function (){
+        var car = new Object();
+        car.name = $('#name').val();
+        car.manufacturer = $('#manufacturer').val();
+        car.year = $('#year').val();
+        car.color = $('#color').val();
+        car.price = $('#price').val();
+        var myString = JSON.stringify(car);
+        console.log(car);
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "http://localhost:8080/api/add",
+            data: JSON.stringify(car),
+            dataType: "json",
+            success: function (msg) {
+                alert('Success');
+            },
+            error: function (err){
+                alert('Error');
+            }
+        });
+        location.reload();
+    })
+
+    showListData();
+    var listCount=[];
+    function showListData(){
+        $.getJSON('http://localhost:8080/api', function(data) {
+            $.each(data, function(j, field) {
+                listCount.push(field.id);
+                var del = 'delete' + field.id;
+                var edit = 'edit' + field.id;
+                $('table').append('<tr id =' + j + '></tr>')
+                $('#' + j).append('<td>' + field.name + '</td>');
+                $('#' + j).append('<td>' + field.price + '</td>');
+                $('#' + j).append('<td><button id='+edit+' value='+edit+'>Edit</button><button id =' +del +' value='+del+'>Delete</button></td>');
+            });
+        });
+    }
+
+    $(document).on("click","table tr td button", function() { // any button
+        console.log($(this).val());
+        var var_compare = $(this).val();
+        for (var i = 0; i <= listCount.length; i++) {
+            if(var_compare == ('delete' + listCount[i])){
+                alert('Do u want delete?');
+                $.ajax({
+                    type: "DELETE",
+                    contentType: "application/json; charset=utf-8",
+                    url: "http://localhost:8080/api/delete/" + listCount[i],
+                });
+                console.log("done delete");
+                location.reload();
+            }
+            if(var_compare == ('edit' + listCount[i])){
+                $.getJSON('http://localhost:8080/api/' + listCount[i], function(data) {
+                    console.log(data);
+                    $('#form_edit').show();
+                    $('#name_edit').val(data.name);
+                    $('#manufacturer_edit').val(data.manufacturer);
+                    $('#year_edit').val(data.year);
+                    $('#color_edit').val(data.color);
+                    $('#price_edit').val(data.price);
+                    var tempid = data.id;
+
+                    $('#submit_edit').click(function () {
+                        var car = new Object();
+                        car.id = tempid;
+                        car.name = $('#name_edit').val();
+                        car.manufacturer = $('#manufacturer_edit').val();
+                        car.year = $('#year_edit').val();
+                        car.color = $('#color_edit').val();
+                        car.price = $('#price_edit').val();
+                        console.log(car.id);
+
+                        $.ajax({
+                            type: "PUT",
+                            contentType: "application/json; charset=utf-8",
+                            url: "http://localhost:8080/api/update/" + car.id,
+                            data: JSON.stringify(car),
+                            dataType: "json",
+                            success: function (msg) {
+                                alert('Success');
+                            },
+                            error: function (err) {
+                                alert('Error');
+                            }
+                        });
+                        location.reload();
+                    })
+                })
+            }
+        }
+    });
+</script>
+</body>
+</html>
